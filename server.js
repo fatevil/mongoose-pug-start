@@ -51,4 +51,11 @@ app.post('/cats', upload.array(), (req, res) => {
     });
 });
 
+app.get('/cats', (req, res) => {
+    Cat.find().exec().then((posts) => {
+        res.send(posts);
+    });
+});
+
+
 
