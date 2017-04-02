@@ -11,4 +11,4 @@ config.pwd = 'password';
 
 module.exports = config;
 ```
-* run `pm run watch`
+* run `npm run watch`
