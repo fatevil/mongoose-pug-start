@@ -1,0 +1,26 @@
+doctype html
+
+html
+  head
+    title= title
+    meta(charset='utf-8')
+  body
+    h1= message
+
+    div
+      h1 My heading
+      ul
+        li Some list item
+        li Some other list item
+      p This here is a paragraph.
+
+    table
+      tr
+        th= 'ID'
+        th= 'Name'
+        th= 'Age'
+      each val in posts
+        tr
+          td= val._id
+          td= val.name
+          td= val.age
