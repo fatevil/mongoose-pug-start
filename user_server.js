@@ -62,6 +62,8 @@ app.route('/user')
         const id = req.params.id;
         User.findById(id).exec().then((array) => {
             res.send(array);
+        }).catch({
+            next(err);
         });
     })
     .post(function(req, res) {
@@ -84,6 +86,8 @@ app.route('/user')
             res.send({
                 status: 'OK'
             });
+        }).catch({
+            next(err);
         });
     })
     .delete(function(req, res) {
