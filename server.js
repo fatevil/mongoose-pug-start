@@ -40,15 +40,19 @@ const catSchema = {
 
 const Cat = DB.getSchema('Cat', catSchema);
 
+app.get('/cats/pug', function(req, res) {
+
+    Cat.find().exec().then((array) => {
+        res.render('index', {
+            title: 'Hey',
+            message: 'Hello there!',
+            posts: array
+        })
+    });
+});
+
 app.post('/cats', upload.array(), (req, res) => {
-    console.log('POST');
-
-    const newCat = req.body;
-
-    delete newCat._id;
-
-    console.log(newCat);
-
+    delete req.body._id;
     Cat.create(req.body).then((post) => {
         res.send({
             status: 'OK',
@@ -63,19 +67,13 @@ app.post('/cats', upload.array(), (req, res) => {
 });
 
 app.patch('/cats', upload.array(), (req, res) => {
-    console.log('PUT');
-
-    const catId = req.body._id;
-
     const catData = req.body;
-    delete catData._id;
 
     Cat.update({
-        _id: catId
+        _id: catData._id
     }, {
         $set: catData
     }, () => {
-        console.log('Cat updated');
         res.send({
             status: 'OK'
         });
@@ -83,13 +81,7 @@ app.patch('/cats', upload.array(), (req, res) => {
 });
 
 app.delete('/cats/:catId', (req, res) => {
-    console.log(req.params);
-
-    const catId = req.params.catId;
-
-    console.log('DELETE cat ' + catId);
-
-    Cat.findById(catId).remove().exec()
+    Cat.findById(req.params.catId).remove().exec()
         .then(() => {
             res.send({
                 status: 'OK'
@@ -104,14 +96,3 @@ app.get('/cats', (req, res) => {
         res.send(posts);
     });
 });
-
-app.get('/cats/pug', function(req, res) {
-
-    Cat.find().exec().then((array) => {
-        res.render('index', {
-            title: 'Hey',
-            message: 'Hello there!',
-            posts: array
-        })
-    });
-})
