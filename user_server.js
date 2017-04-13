@@ -4,6 +4,10 @@ const config = require('./config');
 const DB = require('./modules/database');
 const app = express();
 
+const users = require('./routes/users');
+const people = require('./routes/people');
+const apartments = require('./routes/apartments');
+
 // connect to DB
 const dbPromise = new Promise(
     (resolve, reject) => {
@@ -23,11 +27,9 @@ const userSchema = {
     password: String
 };
 const User = DB.getSchema('User', userSchema);
-
-const middlewareLogger = function(req, res, next) {
-    console.log(`${new Date()}: ${req.url} client: ${req.ip} ${req.headers['user-agent']}`);
-    next();
-}
+app.use('/apartments', apartments);
+app.use('/people', people);
+app.use('/users', users);
 
 // about middleware libraries:
 // I think there's a lot of nice libraries, but none of them really "took my breath away"
@@ -39,65 +41,17 @@ const middlewareLogger = function(req, res, next) {
 //      - express debug? 
 //      - passport
 
-// for loggin to files Winstonjs looks really nice 
+// for logging to files Winstonjs looks really nice 
 // check https://github.com/winstonjs/winston
-const logErrors = function(err, req, res, next) {
-    console.error(err.stack);
-    next(err);
-}
-const errorHandler = function(err, req, res, next) {
+app.use((req, res, next) => {
+    console.log(`${new Date()}: ${req.url} client: ${req.ip} ${req.headers['user-agent']}`);
+    next();
+});
+app.use((err, req, res, next) => {
     res.status(500);
     res.send('error: There\'s been an error on server!');
-}
-
-app.use(middlewareLogger);
-// error handlers should be the last ones!
-app.use(logErrors);
-app.use(errorHandler);
+});
 
 
-app.route('/user')
-    .get(function(req, res) {
 
-        const id = req.params.id;
-        User.findById(id).exec().then((array) => {
-            res.send(array);
-        }).catch({
-            next(err);
-        });
-    })
-    .post(function(req, res) {
-        User.create(req.body).then((post) => {
-            res.send({
-                status: 'OK',
-                post: post
-            });
-        }).catch(() => {
-            next(err);
-        });
-    })
-    .put(function(req, res) {
-        const id = req.params.id;
-        User.update({
-            _id: id
-        }, {
-            $set: req.body
-        }, () => {
-            res.send({
-                status: 'OK'
-            });
-        }).catch({
-            next(err);
-        });
-    })
-    .delete(function(req, res) {
-        const id = req.params.id;
-        User.findById(id).remove().exec()
-            .then(() => {
-                res.send({
-                    status: 'OK'
-                });
-            }).catch((err) => {
-                next(err);
-            });
-    });
+//app.use(router);
